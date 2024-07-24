@@ -1,0 +1,7 @@
+__pycache__/
+model/*
+!model/model
+data/*
+!data/data
+json_output/*
+csv_output/*

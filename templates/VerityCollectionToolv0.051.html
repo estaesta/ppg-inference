@@ -1,0 +1,74 @@
+<! --- --->
+    <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+    <html>
+
+    <head>
+        <title>Polar ECG->PPG timing application</title>
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+        <!-- <script src="functions.js"></script> -->
+        <script
+        src="{{ url_for('static', filename='functions-v1.js') }}"
+        ></script>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
+        <style>
+            body {
+                font-family: 'Roboto';
+                font-size: 16px;
+            }
+
+            table {
+                font-family: 'Roboto';
+                font-size: 16px;
+            }
+
+            button {
+                font-family: 'Roboto';
+                font-size: 16px;
+            }
+
+            input[type='number'] {
+                width: 60px;
+            }
+
+            input[type='text'] {
+                width: 400px;
+            }
+        </style>
+        <title>Polar H10 and Verity Sense Data Collection</title>
+    </head>
+    <h1>Polar H10 and Verity Sense Data Collection</h1>
+    <p>This application was developed on Chrome (it is based on <a href="https://web.dev/bluetooth/">Web Bluetooth
+            API</a> communicating with Polar devices. Connect to the device(s) and then start the data streams. Change
+        scale of PPG with the buttons below each graph (it also scales trigger sensitivity).</p>
+    <button id='Sense' onClick="addDevice('')">Connect a Polar Sensor</button>
+    <button id='emptybuffer' onClick="emptybuffer()">Empty record buffer</button>
+    <button id='download' onClick="download()">Download data</button>
+    <br><input type="text" id="markername" size="20" title="Enter your marker text here"><button
+        title="This adds a marker button with the specified text" onClick="AddMarker()">Make marker button</button>
+    <table border=1 id='Markers'></table>
+    <table border=0>
+        <tr>
+            <td>
+                <div id='streams'>
+            </td>
+        </tr>
+    </table>
+    <div id='graphsdiv' style="height:80px;width:100%;"></div>
+    <h2>Marker list</h2>
+    <table id="list_timing">
+        <th>Date/time</th>
+        <th>Time (UNIX)</th>
+        <th>Marker</th>
+    </table>
+    <h2>Result</h2>
+    <div id="responseContainer"></div>
+
+    <div id='Combined' style="height:300px;width:80%;"></div>
+    <script>
+        //serviceButtons();
+        setInterval(updateGraphs, 200);
+    //document.getElementById("exit").addEventListener('click',function(){disconnect()});
+    </script>
+
+    </html>
