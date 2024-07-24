@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 from extraction_function import preprocess_all
 from tensorflow.keras.models import load_model
+import time
 import numpy as np
 import joblib
 
@@ -22,6 +23,7 @@ def index2():
 
 @app.route("/predict", methods=["POST"])
 def predict():
+    start = time.time()
     global model
     # Get the data from the POST request.
     data = request.get_json(force=True)
@@ -56,7 +58,9 @@ def predict():
     # hr = hr.tolist()
     result = {"result": result, "hr": hr[-1:], "mean_hr": np.mean(hr)}
     # return jsonify({"result": result, "bp_bvp": bp_bvp})
-    return jsonify(result)
+    result = jsonify(result)
+    print(f'Time taken: {time.time() - start}')
+    return result
 
 @app.route("/test", methods=["GET"])
 def test():
