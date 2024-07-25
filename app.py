@@ -12,6 +12,7 @@ int_to_label = {1: 'baseline', 2: 'stress', 0: 'amusement'}
 
 #model global variable
 model = None
+model_name = ""
 
 @app.route("/", methods=["GET"])
 def index():
@@ -25,14 +26,6 @@ def index2():
 @app.route("/change_model", methods=["POST"])
 def change_model():
     global model
-    # model: svm, lstm, lstmfcn, cnn
-    # let response = await fetch("/change_model", {
-    #   method: "POST",
-    #   headers: {
-    #     "Content-Type": "application/json",
-    #   },
-    #   body: JSON.stringify({ model: model }),
-    # });
     modelName = request.get_json(force=True)["model"]
 
 
@@ -52,39 +45,36 @@ def change_model():
 def predict():
     start = time.time()
     global model
+    global model_name
     # Get the data from the POST request.
     data = request.get_json(force=True)
     # print(data)
     ppg_signal = data["ppg_signal"]
+    request_model = data["model"]
+    # check if model is the same. If not, load the new model
+    if request_model != model_name:
+        model_name = request_model
+        match model_name:
+            case "svm":
+                model = joblib.load('./model/svm_tri_1swin.pkl')
+            case "lstmfcn":
+                model = load_model('./model/lstmfcn-tri-1swin-256bs-seed0.h5')
+            case "cnn":
+                model = load_model('./model/cnn-tri-1swin-256bs-seed0.h5')
+            case _:
+                model = None
 
-    preprocessed_ppg, _, bp_bvp, hr = preprocess_all(ppg_signal)
-    # print(f'Preprocessed PPG: {preprocessed_ppg}')
-    # print(preprocessed_ppg)
+    preprocessed_ppg, _, _, hr = preprocess_all(ppg_signal)
 
-    # Make prediction and return result.
-    # cnn
-    # make the model load first time only
-    # model = load_model('./model/cnn-tri-256bs-seed0.h5')
     if model is None:
-        # model = load_model('./model/cnn-tri-256bs-seed0.h5')
-        # model = load_model('./model/lstmfcn-tri-1swin-256bs-seed0.h5')
         model = load_model('./model/cnn-tri-1swin-256bs-seed0.h5')
+        model_name = "cnn"
     result = model.predict(preprocessed_ppg)
     # one-hot encoding to class
-    result = np.argmax(result, axis=1)
+    if model_name != "svm":
+        result = np.argmax(result, axis=1)
     result = int_to_label[result[0]]
-    # svm
-    # model = joblib.load('./model/svm_tri.pkl')
-    # # model = joblib.load('./model/svm_tri_1swin.pkl')
-    # result = model.predict(preprocessed_ppg)
-    # print(result)
-    # result = int_to_label[result[0]]
-    # return bp_bvp too
-    # bp_bvp = bp_bvp.tolist()
-    # return hr too
-    # hr = hr.tolist()
     result = {"result": result, "hr": hr[-1:], "mean_hr": np.mean(hr)}
-    # return jsonify({"result": result, "bp_bvp": bp_bvp})
     result = jsonify(result)
     print(f'Time taken: {time.time() - start}')
     return result
