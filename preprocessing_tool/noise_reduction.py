@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 # +
-import math
+# import math
 from scipy import signal
 # from scipy import fft, ifft
 from scipy import fftpack
 from scipy.stats import kurtosis, skew
 from scipy.signal import butter, lfilter
-from scipy import stats
+# from scipy import stats
 from sklearn.linear_model import LinearRegression
 
 

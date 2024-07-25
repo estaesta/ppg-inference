@@ -4,7 +4,7 @@
 import numpy as np
 import pandas as pd
 import joblib
-from sklearn.preprocessing import StandardScaler
+# from sklearn.preprocessing import StandardScaler
 
 # from scipy.interpolate import UnivariateSpline
 from preprocessing_tool.feature_extraction import *

@@ -10,11 +10,11 @@ from .peak_detection import *
 
 import math
 import numpy as np
-import pandas as pd
+# import pandas as pd
 import nolds
 
 from scipy.interpolate import UnivariateSpline
-from scipy import stats
+# from scipy import stats
 
 
 # +
@@ -71,62 +71,62 @@ def calc_heartrate(RR_list):
 
 # -
 
-def get_window_stats_original(ppg_seg, window_length, label=-1):  # Nan을 제외하고 평균 냄 
-    
-    fs = 64   
-    
-    peak = threshold_peakdetection(ppg_seg, fs)
-    RR_list, RR_diff, RR_sqdiff = calc_RRI(peak, fs)
-    
-    # Time
-    HR = calc_heartrate(RR_list)
-    print(f'heart_rate: {HR}')
-    HR_mean, HR_std = np.mean(HR), np.std(HR)
-    SD_mean, SD_std = np.mean(RR_diff) , np.std(RR_diff)
-    NN50 = [x for x in RR_diff if x > 50]
-    pNN50 = len(NN50) / window_length
-    bar_y, bar_x = np.histogram(RR_list)
-    TINN = np.max(bar_x) - np.min(bar_x)
-    RMSSD = np.sqrt(np.mean(RR_sqdiff))
-    
-    # Frequency
-    rr_x = []
-    pointer = 0
-    for x in RR_list:
-        pointer += x
-        rr_x.append(pointer)
-    RR_x_new = np.linspace(rr_x[0], rr_x[-1], int(rr_x[-1]))
-    
-    if len(rr_x) <= 5 or len(RR_list) <= 5:
-        print("rr_x or RR_list less than 5")   
-    
-   
-    interpolated_func = UnivariateSpline(rr_x, RR_list, k=3)
-    
-    datalen = len(RR_x_new)
-    frq = np.fft.fftfreq(datalen, d=((1/1000.0)))
-    frq = frq[range(int(datalen/2))]
-    Y = np.fft.fft(interpolated_func(RR_x_new))/datalen
-    Y = Y[range(int(datalen/2))]
-    psd = np.power(Y, 2)  # power spectral density
-
-    lf = np.trapz(abs(psd[(frq >= 0.04) & (frq <= 0.15)])) #Slice frequency spectrum where x is between 0.04 and 0.15Hz (LF), and use NumPy's trapezoidal integration function to find the are
-    hf = np.trapz(abs(psd[(frq > 0.15) & (frq <= 0.5)])) #Do the same for 0.16-0.5Hz (HF)
-    ulf = np.trapz(abs(psd[frq < 0.003]))
-    vlf = np.trapz(abs(psd[(frq >= 0.003) & (frq < 0.04)]))
-    
-    if hf != 0:
-        lfhf = lf/hf
-    else:
-        lfhf = 0
-        
-    total_power = lf + hf + vlf
-
-    features = {'HR_mean': HR_mean, 'HR_std': HR_std, 'SD_mean': SD_mean, 'SD_std': SD_std, 'pNN50': pNN50, 'TINN': TINN, 'RMSSD': RMSSD,
-                'LF': lf, 'HF': hf, 'ULF' : ulf, 'VLF': vlf, 'LFHF': lfhf, 'Total_power': total_power, 'label': label}
-
-    return features
-
+# def get_window_stats_original(ppg_seg, window_length, label=-1):  # Nan을 제외하고 평균 냄 
+#     
+#     fs = 64   
+#     
+#     peak = threshold_peakdetection(ppg_seg, fs)
+#     RR_list, RR_diff, RR_sqdiff = calc_RRI(peak, fs)
+#     
+#     # Time
+#     HR = calc_heartrate(RR_list)
+#     print(f'heart_rate: {HR}')
+#     HR_mean, HR_std = np.mean(HR), np.std(HR)
+#     SD_mean, SD_std = np.mean(RR_diff) , np.std(RR_diff)
+#     NN50 = [x for x in RR_diff if x > 50]
+#     pNN50 = len(NN50) / window_length
+#     bar_y, bar_x = np.histogram(RR_list)
+#     TINN = np.max(bar_x) - np.min(bar_x)
+#     RMSSD = np.sqrt(np.mean(RR_sqdiff))
+#     
+#     # Frequency
+#     rr_x = []
+#     pointer = 0
+#     for x in RR_list:
+#         pointer += x
+#         rr_x.append(pointer)
+#     RR_x_new = np.linspace(rr_x[0], rr_x[-1], int(rr_x[-1]))
+#     
+#     if len(rr_x) <= 5 or len(RR_list) <= 5:
+#         print("rr_x or RR_list less than 5")   
+#     
+#    
+#     interpolated_func = UnivariateSpline(rr_x, RR_list, k=3)
+#     
+#     datalen = len(RR_x_new)
+#     frq = np.fft.fftfreq(datalen, d=((1/1000.0)))
+#     frq = frq[range(int(datalen/2))]
+#     Y = np.fft.fft(interpolated_func(RR_x_new))/datalen
+#     Y = Y[range(int(datalen/2))]
+#     psd = np.power(Y, 2)  # power spectral density
+#
+#     lf = np.trapz(abs(psd[(frq >= 0.04) & (frq <= 0.15)])) #Slice frequency spectrum where x is between 0.04 and 0.15Hz (LF), and use NumPy's trapezoidal integration function to find the are
+#     hf = np.trapz(abs(psd[(frq > 0.15) & (frq <= 0.5)])) #Do the same for 0.16-0.5Hz (HF)
+#     ulf = np.trapz(abs(psd[frq < 0.003]))
+#     vlf = np.trapz(abs(psd[(frq >= 0.003) & (frq < 0.04)]))
+#     
+#     if hf != 0:
+#         lfhf = lf/hf
+#     else:
+#         lfhf = 0
+#         
+#     total_power = lf + hf + vlf
+#
+#     features = {'HR_mean': HR_mean, 'HR_std': HR_std, 'SD_mean': SD_mean, 'SD_std': SD_std, 'pNN50': pNN50, 'TINN': TINN, 'RMSSD': RMSSD,
+#                 'LF': lf, 'HF': hf, 'ULF' : ulf, 'VLF': vlf, 'LFHF': lfhf, 'Total_power': total_power, 'label': label}
+#
+#     return features
+#
 
 # +
 
