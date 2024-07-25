@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request, jsonify
 from extraction_function import preprocess_all
-from tensorflow.keras.models import load_model
 import time
 import numpy as np
 import joblib
@@ -29,7 +28,6 @@ def change_model():
     global model
     modelName = request.get_json(force=True)["model"]
 
-
     match modelName:
         case "svm":
             model = joblib.load('./model/svm_tri_1swin.pkl')
@@ -55,6 +53,9 @@ def predict():
     # check if model is the same. If not, load the new model
     if request_model != model_name:
         model_name = request_model
+        if model_name != "svm":
+            from tensorflow.keras.models import load_model
+            
         match model_name:
             case "svm":
                 model = joblib.load('./model/svm_tri_1swin.pkl')
@@ -80,15 +81,16 @@ def predict():
     if model_name != "svm":
         result = np.argmax(result, axis=1)
     result = int_to_label[result[0]]
-    result = {"result": result, "hr": hr[-1:], "mean_hr": np.mean(hr)}
-    result = jsonify(result)
-    time_taken = time.time() - start
-    print(f"Time taken: {time_taken}")
+    output = {"result": result, "hr": hr[-1:], "mean_hr": np.mean(hr)}
+    output = jsonify(output)
+    # time in ms
+    time_taken = (time.time() - start) * 1000
+    print(f"Time taken: {time_taken} ms")
     # write to csv
     with open("csv_output/results.csv", "a") as f:
-        f.write(f"{result}, {time_taken}, {mem}\n")
+        f.write(f"{model_name}, {result}, {time_taken}, {mem}\n")
         f.close()
-    return result
+    return output
 
 @app.route("/test", methods=["GET"])
 def test():
