@@ -4,6 +4,7 @@ from tensorflow.keras.models import load_model
 import time
 import numpy as np
 import joblib
+import psutil
 
 app = Flask(__name__)
 
@@ -70,13 +71,22 @@ def predict():
         model = load_model('./model/cnn-tri-1swin-256bs-seed0.h5')
         model_name = "cnn"
     result = model.predict(preprocessed_ppg)
+    # process memory usage in MB
+    mem_usage = psutil.virtual_memory().used / 1024 / 1024
+    print(f"Memory usage: {mem_usage} MB")
+
     # one-hot encoding to class
     if model_name != "svm":
         result = np.argmax(result, axis=1)
     result = int_to_label[result[0]]
     result = {"result": result, "hr": hr[-1:], "mean_hr": np.mean(hr)}
     result = jsonify(result)
-    print(f'Time taken: {time.time() - start}')
+    time_taken = time.time() - start
+    print(f"Time taken: {time_taken}")
+    # write to csv
+    with open("results.csv", "a") as f:
+        f.write(f"{ppg_signal}, {result}, {hr[-1:]}, {np.mean(hr)}, {time_taken}, {mem_usage}\n")
+        f.close()
     return result
 
 @app.route("/test", methods=["GET"])
