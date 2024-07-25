@@ -27,6 +27,8 @@ def preprocess_all(ppg_signal):
     Returns:
     - processed_data: DataFrame of extracted features
     - window_len: number of windows
+    - bp_bvp: band-pass filtered ppg signal
+    - hr: heart rate
     """
         
     sec = 12

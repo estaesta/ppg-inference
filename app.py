@@ -21,6 +21,33 @@ def index():
 def index2():
     return render_template("index.html")
 
+#change model
+@app.route("/change_model", methods=["POST"])
+def change_model():
+    global model
+    # model: svm, lstm, lstmfcn, cnn
+    # let response = await fetch("/change_model", {
+    #   method: "POST",
+    #   headers: {
+    #     "Content-Type": "application/json",
+    #   },
+    #   body: JSON.stringify({ model: model }),
+    # });
+    modelName = request.get_json(force=True)["model"]
+
+
+    match modelName:
+        case "svm":
+            model = joblib.load('./model/svm_tri_1swin.pkl')
+        case "lstmfcn":
+            model = load_model('./model/lstmfcn-tri-1swin-256bs-seed0.h5')
+        case "cnn":
+            model = load_model('./model/cnn-tri-1swin-256bs-seed0.h5')
+        case _:
+            model = None
+    return jsonify({"model": modelName})
+
+
 @app.route("/predict", methods=["POST"])
 def predict():
     start = time.time()

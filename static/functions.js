@@ -1208,6 +1208,35 @@ async function sendDataToAPI(data) {
   }
 }
 
+async function changeModel(model) {
+// fetch to /predict post
+  try {
+    let response = await fetch("/change_model", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ model: model }),
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    let responseData = await response.json(); // Assuming the response is in JSON format
+    console.log("Model changed successfully:", responseData);
+    // displayResponse(responseData); // Function to update the UI
+  }
+  catch (error) {
+    console.error("Error changing model:", error);
+  }
+}
+window.addEventListener("DOMContentLoaded", (event) => {
+  modelSelect = document.getElementById("modelSelect");
+  modelSelect.addEventListener("change", function () {
+    changeModel(modelSelect.value);
+  });
+});
+
+
 // nats publish
 async function publishDataToNats(data) {
   //TODO: Implement the nats publish logic
