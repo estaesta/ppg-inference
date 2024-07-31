@@ -16,7 +16,7 @@ model = None
 model_name = ""
 
 tf_support = False
-tfl_support = False
+tfl_support = True
 
 if tf_support:
     from tensorflow.keras.models import load_model
@@ -111,9 +111,9 @@ def predict():
 
     preprocessed_ppg, _, _, hr = preprocess_all(ppg_signal)
 
-    if model is None:
-        model = load_model('./model/cnn-tri-1swin-256bs-seed0.h5')
-        model_name = "cnn"
+    # if model is None:
+    #     model = load_model('./model/cnn-tri-1swin-256bs-seed0.h5')
+    #     model_name = "cnn"
 
     # predict
     # check if tflite
