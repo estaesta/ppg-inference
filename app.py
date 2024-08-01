@@ -57,6 +57,7 @@ def index2():
 @app.route("/change_model", methods=["POST"])
 def change_model():
     global model
+    global model_name
     request_model = request.get_json(force=True)["model"]
 
     if request_model != model_name:
