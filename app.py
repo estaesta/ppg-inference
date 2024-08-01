@@ -5,6 +5,7 @@ import time
 import numpy as np
 import joblib
 import resource
+from threading import Lock
 
 app = Flask(__name__)
 
@@ -13,6 +14,7 @@ int_to_label = {1: 'baseline', 2: 'stress', 0: 'amusement'}
 
 #model global variable
 model = None
+model_lock = Lock()
 model_name = ""
 
 tf_support = False
@@ -75,38 +77,40 @@ def predict():
     request_model = data["model"]
     # check if model is the same. If not, load the new model
     if request_model != model_name:
-        model_name = request_model
-        print(f"Model changed to {model_name}")
+        # print(f"Model changed to {model_name}")
         # if model_name != "svm":
         #     from tensorflow.keras.models import load_model
         # if model_name[-3:] == "tfl":
         #     import tflite_runtime.interpreter as tflite
             
-        match model_name:
-            case "svm":
-                model = joblib.load('./model/svm_tri_1swin.pkl')
-            case "lstm512":
-                model = load_model('./model/lstm512-tri-1swin-256bs-seed0.h5')
-            case "lstm512_tfl":
-                model = tflite_load('./model/tflite/lstm512-tri-1swin-256bs-seed0.tflite')
-            case "lstm256":
-                model = load_model('./model/lstm256-tri-1swin-256bs-seed0.h5')
-            case "lstm256_tfl":
-                model = tflite_load('./model/tflite/lstm256-tri-1swin-256bs-seed0.tflite')
-            case "bilstm":
-                model = load_model('./model/bilstm-tri-1swin-256bs-seed0.h5')
-            case "bilstm_tfl":
-                model = tflite_load('./model/tflite/bilstm-tri-1swin-256bs-seed0.tflite')
-            case "lstmfcn":
-                model = load_model('./model/lstmfcn-tri-1swin-256bs-seed0.h5')
-            case "lstmfcn_tfl":
-                model = tflite_load('./model/tflite/lstmfcn-tri-1swin-256bs-seed0.tflite')
-            case "cnn":
-                model = load_model('./model/cnn-tri-1swin-256bs-seed0.h5')
-            case "cnn_tfl":
-                model = tflite_load('./model/tflite/cnn-tri-1swin-256bs-seed0.tflite')
-            case _:
-                model = None
+        with model_lock:
+            if request_model != model_name:
+                match request_model:
+                    case "svm":
+                        model = joblib.load('./model/svm_tri_1swin.pkl')
+                    case "lstm512":
+                        model = load_model('./model/lstm512-tri-1swin-256bs-seed0.h5')
+                    case "lstm512_tfl":
+                        model = tflite_load('./model/tflite/lstm512-tri-1swin-256bs-seed0.tflite')
+                    case "lstm256":
+                        model = load_model('./model/lstm256-tri-1swin-256bs-seed0.h5')
+                    case "lstm256_tfl":
+                        model = tflite_load('./model/tflite/lstm256-tri-1swin-256bs-seed0.tflite')
+                    case "bilstm":
+                        model = load_model('./model/bilstm-tri-1swin-256bs-seed0.h5')
+                    case "bilstm_tfl":
+                        model = tflite_load('./model/tflite/bilstm-tri-1swin-256bs-seed0.tflite')
+                    case "lstmfcn":
+                        model = load_model('./model/lstmfcn-tri-1swin-256bs-seed0.h5')
+                    case "lstmfcn_tfl":
+                        model = tflite_load('./model/tflite/lstmfcn-tri-1swin-256bs-seed0.tflite')
+                    case "cnn":
+                        model = load_model('./model/cnn-tri-1swin-256bs-seed0.h5')
+                    case "cnn_tfl":
+                        model = tflite_load('./model/tflite/cnn-tri-1swin-256bs-seed0.tflite')
+                    case _:
+                        model = None
+                model_name = request_model
         print(f"Model changed to {model_name}")
 
     preprocessed_ppg, _, _, hr = preprocess_all(ppg_signal)
