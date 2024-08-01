@@ -121,7 +121,7 @@ def predict():
         result = tflite_predict(model, preprocessed_ppg)
         print(result)
     else:
-        result = model.predict(preprocessed_ppg)
+        result = model.predict(preprocessed_ppg, verbose=0)
     # process memory usage in MB
     mem = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss/1024
     print(f"Memory usage: {mem} MB")
