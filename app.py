@@ -119,7 +119,7 @@ def predict():
     # check if tflite
     if model_name[-3:] == "tfl":
         result = tflite_predict(model, preprocessed_ppg)
-        print(result)
+        # print(result)
     else:
         result = model.predict(preprocessed_ppg, verbose=0)
     # process memory usage in MB
