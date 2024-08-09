@@ -5,3 +5,4 @@ data/*
 !data/data
 json_output/*
 csv_output/*
+node_modules/*

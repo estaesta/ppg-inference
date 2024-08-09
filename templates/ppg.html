@@ -1,0 +1,144 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Stress Detection Using PPG</title>
+    <!-- <script
+      src="https://unpkg.com/htmx.org@1.9.4"
+      integrity="sha384-zUfuhFKKZCbHTY6aRR46gxiqszMk5tcHjsVFxnUo8VMus4kHGVdIYVbOYYNlKmHV"
+      crossorigin="anonymous"
+    ></script> -->
+    <!-- <script src="https://unpkg.com/hyperscript.org@0.9.9"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <script src="../static/functions.js" charset="utf-8"></script>
+    <link
+      rel="stylesheet"
+      href="../static/css/bootstrap.min.css"
+      type="text/css"
+      media="all"
+    />
+  </head>
+  <body>
+    <div class="container my-4">
+      <h1 class="fs-1 fw-bold mb-4">Stress Detection Using PPG</h1>
+      <div class="row">
+        <div class="col-3 p-0">
+          <div class="card p-3">
+            <div class="row">
+              <div>
+                <button
+                  id="Sense"
+                  onClick="addDevice('')"
+                  class="btn btn-secondary w-100"
+                >
+                  Connect a Polar Sensor
+                </button>
+              </div>
+            </div>
+            <div class="row">
+              <div class="mt-2 d-flex justify-content-between gap-2">
+                <button
+                  id="emptybuffer"
+                  onClick="emptybuffer()"
+                  class="flex-fill btn btn-danger"
+                >
+                  Empty buffer
+                </button>
+                <button
+                  id="download"
+                  onClick="download()"
+                  class="btn btn-success"
+                >
+                  Download data
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="card p-3 mt-2">
+            <label for="nama" class="">Nama pasien: </label>
+            <input
+              class="mb-2"
+              type="text"
+              name="name"
+              id="name"
+              placeholder="Nama Pasien"
+              required
+            />
+            <label for="sample_rate" class="">Sample rate:</label>
+            <select class="" name="sample_rate" id="sample_rate">
+              <!-- <option value="28">28 Hz</option> -->
+              <!-- <option value="44">44 Hz</option> -->
+              <!-- <option value="135" selected>135 Hz</option> -->
+              <!-- <option value="176">176 Hz</option> -->
+            </select>
+            <!-- model -->
+            <label for="model" class="">Model:</label>
+            <select name="model" id="modelSelect">
+              <!-- none -->
+              <option value="none">None</option>
+              <!-- svm, lstm, lstmfcn, cnn -->
+              <option value="svm">SVM</option>
+              <option value="lstm512">LSTM-512</option>
+              <option value="lstm512_tfl">LSTM-512 tflite</option>
+              <option value="lstm256">LSTM-256</option>
+              <option value="lstm256_tfl">LSTM-256 tflite</option>
+              <option value="lstmfcn">LSTM-FCN</option>
+              <option value="lstmfcn_tfl">LSTM-FCN tflite</option>
+              <option value="bilstm">Bi-LSTM</option>
+              <option value="bilstm_tfl">Bi-LSTM tflite</option>
+              <option value="cnn">CNN</option>
+              <option value="cnn_tfl">CNN tflite</option>
+            </select>
+            <!-- time -->
+            <label for="time" class="">Time (minutes):</label>
+            <select name="" id="time">
+              <option value="-1">Unlimited</option>
+              <option value="1">test 1</option>
+              <option value="5">5</option>
+              <option value="10">10</option>
+            </select>
+            <br />
+            <!-- <div class="d-flex justify-content"> -->
+            <button class="btn btn-primary" onClick="start()" id="start-button">
+              Start
+            </button>
+            <!-- timer -->
+            <div id="timer" class="mt-2"></div>
+            <!-- </div> -->
+            <div id="inferenceTime"></div>
+          </div>
+        </div>
+        <div class="card col mx-3">
+          <div class="card-header">PPG Plot</div>
+          <div class="p-3">
+            <div id="ecgplot">
+              <div
+                id="ecgplotchart"
+                style="width: 100%; height: 250px"
+                class="p-0 m-0"
+              ></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row mt-3">
+        <div class="card col-5" style="min-height: 10rem">
+          <div class="card-header">Result</div>
+          <div class="p-3">
+            <div id="info"></div>
+          </div>
+        </div>
+        <div class="card col mx-3" style="min-height: 10rem">
+          <div class="card-header">Result</div>
+          <div class="p-3">
+            <!-- <div id="sampleplot"></div> -->
+            <div id="responseContainer"
+              class="fs-3 fw-bold"
+            ></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

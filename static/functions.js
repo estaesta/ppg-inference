@@ -1196,6 +1196,7 @@ async function sendDataToAPI(data) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
+        name: document.getElementById("name").value,
         ppg_signal: data,
         // model: document.getElementById("modelSelect").value,
       }),

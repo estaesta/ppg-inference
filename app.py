@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, jsonify
+from flask_socketio import SocketIO, emit
 from extraction_function import preprocess_all
 
 # from utils import *
@@ -9,6 +10,8 @@ import resource
 from threading import Lock
 
 app = Flask(__name__)
+app.config["SECRET_KEY"] = "secret!"
+socketio = SocketIO(app)
 
 label_dict = {"baseline": 1, "stress": 2, "amusement": 0}
 int_to_label = {1: "baseline", 2: "stress", 0: "amusement"}
@@ -45,12 +48,13 @@ def tflite_predict(interpreter, data):
 
 @app.route("/", methods=["GET"])
 def index():
-    return render_template("VerityCollectionToolv0.051.html")
-
-
-@app.route("/index", methods=["GET"])
-def index2():
     return render_template("index.html")
+    # return render_template("VerityCollectionToolv0.051.html")
+
+
+@app.route("/ppg", methods=["GET"])
+def ppg():
+    return render_template("ppg.html")
 
 
 # change model
@@ -112,6 +116,7 @@ def predict():
     data = request.get_json(force=True)
     # print(data)
     ppg_signal = data["ppg_signal"]
+    name = data["name"]
     # request_model = data["model"]
     # # check if model is the same. If not, load the new model
     # if request_model != model_name:
@@ -154,6 +159,8 @@ def predict():
     #                     model = None
     #             model_name = request_model
     #     print(f"Model changed to {model_name}")
+    if model is None:
+        return jsonify({"result": "No model loaded"})
 
     preprocessed_ppg, _, _, hr = preprocess_all(ppg_signal)
 
@@ -178,19 +185,58 @@ def predict():
     result = int_to_label[result[0]]
     output = {"result": result, "hr": hr[-1:], "mean_hr": np.mean(hr)}
     output = jsonify(output)
+
     # time in ms
     time_taken = (time.time() - start) * 1000
     print(f"Time taken: {time_taken} ms")
+
     # write to csv
     with open("csv_output/results.csv", "a") as f:
         f.write(f"{model_name}, {result}, {time_taken}, {mem}\n")
         f.close()
+
+    # send to monitor
+    # send_to_monitor(output)
+    # change: send the name too
+    print(name)
+    print(type(name))
+    send_to_monitor({"stress": result, "name": name, "hr": hr[-1:]})
     return output
 
 
-@app.route("/test", methods=["GET"])
-def test():
-    return "Hello, World!"
+# @app.route("/test", methods=["GET"])
+# def test():
+#     # send to monitor every 1 second infinitely
+#     name1 = "test1"
+#     name2 = "test2"
+#     while True:
+#         #random result
+#         stress1 = np.random.choice(["baseline", "stress", "amusement"])
+#         hr1 = np.random.randint(60, 100)
+#         stress2 = np.random.choice(["baseline", "stress", "amusement"])
+#         hr2 = np.random.randint(60, 100)
+#         send_to_monitor({"stress": stress1, "name": name1, "hr": hr1})
+#         send_to_monitor({"stress": stress2, "name": name2, "hr": hr2})
+#         time.sleep(1)
+#     return "Hello, World!"
+
+@app.route("/monitor", methods=["GET"])
+def monitor():
+    return render_template("monitor.html")
+
+### SocketIO for real-time monitoring
+@socketio.on("connect")
+def test_connect():
+    print("Client connected")
+
+@socketio.on("disconnect")
+def test_disconnect():
+    print("Client disconnected")
+
+# send prediction result to monitor
+def send_to_monitor(result):
+    socketio.emit("monitor", result)
+    print("Sent to monitor")
 
 
 if __name__ == "__main__":
