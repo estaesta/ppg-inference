@@ -173,8 +173,10 @@ def predict():
     if model_name[-3:] == "tfl":
         result = tflite_predict(model, preprocessed_ppg)
         # print(result)
-    else:
+    elif model_name[-2:] == "tf":
         result = model.predict(preprocessed_ppg, verbose=0)
+    else
+        result = model.predict(preprocessed_ppg)
     # process memory usage in MB
     mem = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024
     print(f"Memory usage: {mem} MB")
