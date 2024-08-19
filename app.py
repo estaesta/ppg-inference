@@ -175,7 +175,7 @@ def predict():
         # print(result)
     elif model_name[-2:] == "tf":
         result = model.predict(preprocessed_ppg, verbose=0)
-    else
+    else:
         result = model.predict(preprocessed_ppg)
     # process memory usage in MB
     mem = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024
