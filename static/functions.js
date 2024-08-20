@@ -396,6 +396,7 @@ async function start() {
     // stop the chart after the time
     setTimeout(() => {
       stop();
+      console.log("stopped");
     }, time * 1000 * 60);
   }
 }

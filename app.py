@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, g
 from flask_socketio import SocketIO, emit
 from extraction_function import preprocess_all
 
@@ -44,6 +44,17 @@ def tflite_predict(interpreter, data):
     interpreter.invoke()
     output_data = interpreter.get_tensor(interpreter.get_output_details()[0]["index"])
     return output_data
+
+@app.before_request
+def before_request():
+    g.request_start_time = time.time()
+
+@app.after_request
+def after_request(response):
+# append to csv
+    with open("csv_output/requests.csv", "a") as f:
+        f.write(f"{request.response[0]}, {time.time() - g.request_start_time}\n")
+        f.close()
 
 
 @app.route("/", methods=["GET"])
