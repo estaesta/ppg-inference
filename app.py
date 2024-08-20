@@ -53,7 +53,7 @@ def before_request():
 def after_request(response):
 # append to csv
     with open("csv_output/requests.csv", "a") as f:
-        f.write(f"{request.response[0]}, {time.time() - g.request_start_time}\n")
+        f.write(f"{time.time() - g.request_start_time}\n")
         f.close()
 
 
