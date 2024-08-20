@@ -51,10 +51,12 @@ def before_request():
 
 @app.after_request
 def after_request(response):
-# append to csv
-    with open("csv_output/requests.csv", "a") as f:
-        f.write(f"{time.time() - g.request_start_time}\n")
+    # if response is json, save the time to csv
+    request_time = (time.time() - g.request_start_time) * 1000
+    with open("csv_output/request.csv", "a") as f:
+        f.write(f"{request_time}\n")
         f.close()
+    return response
 
 
 @app.route("/", methods=["GET"])
