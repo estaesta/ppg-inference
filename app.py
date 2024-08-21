@@ -10,8 +10,8 @@ import resource
 from threading import Lock
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = "secret!"
-socketio = SocketIO(app)
+# app.config["SECRET_KEY"] = "secret!"
+# socketio = SocketIO(app)
 
 label_dict = {"baseline": 1, "stress": 2, "amusement": 0}
 int_to_label = {1: "baseline", 2: "stress", 0: "amusement"}
@@ -215,7 +215,7 @@ def predict():
     # change: send the name too
     print(name)
     print(type(name))
-    send_to_monitor({"stress": result, "name": name, "hr": hr[-1:]})
+    # send_to_monitor({"stress": result, "name": name, "hr": hr[-1:]})
     return output
 
 
@@ -235,23 +235,23 @@ def predict():
 #         time.sleep(1)
 #     return "Hello, World!"
 
-@app.route("/monitor", methods=["GET"])
-def monitor():
-    return render_template("monitor.html")
-
-### SocketIO for real-time monitoring
-@socketio.on("connect")
-def test_connect():
-    print("Client connected")
-
-@socketio.on("disconnect")
-def test_disconnect():
-    print("Client disconnected")
-
-# send prediction result to monitor
-def send_to_monitor(result):
-    socketio.emit("monitor", result)
-    print("Sent to monitor")
+# @app.route("/monitor", methods=["GET"])
+# def monitor():
+#     return render_template("monitor.html")
+#
+# ### SocketIO for real-time monitoring
+# @socketio.on("connect")
+# def test_connect():
+#     print("Client connected")
+#
+# @socketio.on("disconnect")
+# def test_disconnect():
+#     print("Client disconnected")
+#
+# # send prediction result to monitor
+# def send_to_monitor(result):
+#     socketio.emit("monitor", result)
+#     print("Sent to monitor")
 
 
 if __name__ == "__main__":
