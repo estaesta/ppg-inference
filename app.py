@@ -255,4 +255,4 @@ def send_to_monitor(result):
 
 
 if __name__ == "__main__":
-    app.run(port=5005)
+    app.run(ssl_context="adhoc")
