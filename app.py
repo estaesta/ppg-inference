@@ -36,6 +36,7 @@ def tflite_load(path):
 
     return interpreter
 
+model = tflite_load("./model/tflite/bilstm-tri-1swin-256bs-seed0.tflite")
 
 def tflite_predict(interpreter, data):
     input_data = np.array(data, dtype=np.float32)
