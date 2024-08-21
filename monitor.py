@@ -20,7 +20,9 @@ def get_max_cpu_usage(process_name, duration):
 
             # Iterate through all processes and find the ones that match the process name
             for proc in psutil.process_iter(['pid', 'name']):
-                if process_name in proc.info['name']:
+                # if process_name in proc.info['name']:
+                # if name = gunicorn or flask
+                if "gunicorn" in proc.info['name'] or "flask" in proc.info['name']:
                     pids.append(proc.info['pid'])
                     print(f"Found process '{process_name}' with PID: {proc.info['pid']}")
 
