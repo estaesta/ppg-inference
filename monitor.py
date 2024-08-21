@@ -13,26 +13,34 @@ def get_max_cpu_usage(process_name, duration):
     start_time = time.time()
     pids = []
 
-    while time.time() - start_time < duration:
-        # Iterate through all processes and find the ones that match the process name
-        for proc in psutil.process_iter(['pid', 'name']):
-            if process_name in proc.info['name']:
-                pids.append(proc.info['pid'])
-                print(f"Found process '{process_name}' with PID: {proc.info['pid']}")
+    while True:
+        try:
+            if time.time() - start_time >= duration:
+                break
 
-        for pid in pids:
-            try:
-                proc = psutil.Process(pid)
-                cpu_usage = proc.cpu_percent(interval=1)
-                max_cpu_usage = max(max_cpu_usage, cpu_usage)
-            except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
-                continue
+            # Iterate through all processes and find the ones that match the process name
+            for proc in psutil.process_iter(['pid', 'name']):
+                if process_name in proc.info['name']:
+                    pids.append(proc.info['pid'])
+                    print(f"Found process '{process_name}' with PID: {proc.info['pid']}")
+
+            for pid in pids:
+                try:
+                    proc = psutil.Process(pid)
+                    cpu_usage = proc.cpu_percent(interval=1)
+                    max_cpu_usage = max(max_cpu_usage, cpu_usage)
+                except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+                    continue
+
+        except KeyboardInterrupt:
+            print("\nInterrupted by user.")
+            break
 
     return max_cpu_usage
 
 # Example usage
 process_name = 'gunicorn'
-duration = 10  # Monitor for 60 seconds
+duration = 10 * 60  # Monitor for 60 seconds
 
 max_cpu = get_max_cpu_usage(process_name, duration)
 print(f"The maximum CPU usage of '{process_name}' during the last {duration} seconds was: {max_cpu}%")
