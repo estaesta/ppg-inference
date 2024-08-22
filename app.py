@@ -124,7 +124,6 @@ def change_model():
 
 @app.route("/predict", methods=["POST"])
 def predict():
-    start = time.time()
     global model
     global model_name
     # Get the data from the POST request.
@@ -185,6 +184,7 @@ def predict():
 
     # predict
     # check if tflite
+    start = time.time()
     if model_name[-3:] == "tfl":
         result = tflite_predict(model, preprocessed_ppg)
         # print(result)
@@ -193,6 +193,9 @@ def predict():
     else:
         result = model.predict(preprocessed_ppg)
     # process memory usage in MB
+    # time in ms
+    time_taken = (time.time() - start) * 1000
+    print(f"Time taken: {time_taken} ms")
     mem = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024
     print(f"Memory usage: {mem} MB")
 
@@ -203,9 +206,6 @@ def predict():
     output = {"result": result, "hr": hr[-1:], "mean_hr": np.mean(hr)}
     output = jsonify(output)
 
-    # time in ms
-    time_taken = (time.time() - start) * 1000
-    print(f"Time taken: {time_taken} ms")
 
     # write to csv
     with open("csv_output/results.csv", "a") as f:
