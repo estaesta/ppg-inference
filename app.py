@@ -215,8 +215,9 @@ def predict():
     # send to monitor
     # send_to_monitor(output)
     # change: send the name too
-    print(name)
-    print(type(name))
+    # print(name)
+    # print(type(name))
+    print(result)
     # send_to_monitor({"stress": result, "name": name, "hr": hr[-1:]})
     return output
 
@@ -257,4 +258,8 @@ def predict():
 
 
 if __name__ == "__main__":
-    app.run(ssl_context="adhoc")
+    # app.run(ssl_context="adhoc")
+    # set port to 5000
+    print("Running on port 5000")
+    app.run(port=5000)
+

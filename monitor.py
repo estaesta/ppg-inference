@@ -48,6 +48,8 @@ def get_max_cpu_and_memory_usage(process_names, duration):
             print("\nInterrupted by user.")
             break
 
+        time.sleep(1)  # Sleep for 1 second before the next reading
+
     average_memory_usage = total_memory_usage / count_memory_readings if count_memory_readings > 0 else 0
 
     # Convert memory usage from bytes to megabytes for readability

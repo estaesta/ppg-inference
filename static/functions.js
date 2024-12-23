@@ -361,14 +361,14 @@ async function start() {
     await sleep(100);
     await ActivateStream(name, streams["PPG"]);
      // initialize the timer
-    let timer = time * 60;
+    // let timer = time * 60;
 
     // update the timer every second
     // time left
-    timerInterval = setInterval(() => {
-      timer--;
-      document.getElementById("timer").innerText = `Time left: ${timer} seconds`;
-    }, 1000);   
+    // timerInterval = setInterval(() => {
+    //   timer--;
+    //   document.getElementById("timer").innerText = `Time left: ${timer} seconds`;
+    // }, 1000);   
 
     // change button from start to stop and chang the colour
     button = document.getElementById("start-button");
@@ -394,10 +394,26 @@ async function start() {
       document.getElementById("timer").innerText = "Time left: 0 seconds";
     });
     // stop the chart after the time
-    setTimeout(() => {
-      stop();
-      console.log("stopped");
-    }, time * 1000 * 60);
+    // setTimeout(() => {
+    //   stop();
+    //   console.log("stopped");
+    // }, time * 1000 * 60);
+    // use precise time
+    let duration = time * 60 * 1000;
+    let start = Date.now();
+    let end = start + duration;
+
+    function timer() {
+      let now = end - Date.now();
+      if (now < 0) {
+        stop();
+        console.log("stopped");
+      } else {
+        requestAnimationFrame(timer);
+        document.getElementById("timer").innerText = `Time left: ${Math.floor(now / 1000)} seconds`;
+      }
+    }
+    requestAnimationFrame(timer);
   }
 }
 async function stop() {
